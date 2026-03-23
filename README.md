@@ -2,6 +2,10 @@
 
 Score Tap Counter is a Flutter app for fast sport score tracking with gesture controls.
 
+## Screenshot
+
+![Score Tap Counter Screenshot](assets/screenshots/score-tap-counter-home.png)
+
 Repository target:
 
 - https://github.com/mluckypradana/score_tap_counter
