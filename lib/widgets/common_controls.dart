@@ -27,7 +27,7 @@ class OverlayActionButton extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             foregroundColor: color,
             side: BorderSide(color: color.withValues(alpha: 0.6)),
-            backgroundColor: Colors.black.withValues(alpha: 0.14),
+            backgroundColor: Colors.black.withValues(alpha: 0.18),
             minimumSize: const Size(44, 44),
             padding: const EdgeInsets.all(10),
           ),
@@ -40,7 +40,7 @@ class OverlayActionButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         foregroundColor: color,
         side: BorderSide(color: color.withValues(alpha: 0.6)),
-        backgroundColor: Colors.black.withValues(alpha: 0.14),
+        backgroundColor: Colors.black.withValues(alpha: 0.18),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       ),
       onPressed: onPressed,

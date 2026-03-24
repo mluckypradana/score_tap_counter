@@ -286,7 +286,7 @@ class _SportCounterPageState extends State<SportCounterPage> {
         style: OutlinedButton.styleFrom(
           foregroundColor: _fontColor,
           side: BorderSide(color: _fontColor.withValues(alpha: 0.7)),
-          backgroundColor: Colors.black.withValues(alpha: 0.2),
+          backgroundColor: Colors.black.withValues(alpha: 0.18),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
         onPressed: () {
@@ -781,7 +781,7 @@ class _SportCounterPageState extends State<SportCounterPage> {
                           child: IconButton(
                             style: IconButton.styleFrom(
                               backgroundColor: Colors.black.withValues(
-                                alpha: 0.2,
+                                alpha: 0.18,
                               ),
                               foregroundColor: _fontColor,
                               side: BorderSide(
@@ -894,7 +894,7 @@ class _SportCounterPageState extends State<SportCounterPage> {
                               color: _fontColor.withValues(alpha: 0.7),
                             ),
                             backgroundColor: Colors.black.withValues(
-                              alpha: 0.2,
+                              alpha: 0.18,
                             ),
                             shape: const CircleBorder(),
                             minimumSize: const Size(64, 64),

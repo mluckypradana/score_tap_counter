@@ -29,6 +29,7 @@ class ScorePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool hasName = playerName.trim().isNotEmpty;
+    final double reservedBottomSpace = footer != null ? 86 : 28;
 
     final Widget nameWidget = hasName
         ? GestureDetector(
@@ -50,7 +51,7 @@ class ScorePanel extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 foregroundColor: fontColor,
                 side: BorderSide(color: fontColor.withValues(alpha: 0.6)),
-                backgroundColor: Colors.black.withValues(alpha: 0.14),
+                backgroundColor: Colors.black.withValues(alpha: 0.18),
                 minimumSize: const Size(48, 48),
                 padding: const EdgeInsets.all(10),
               ),
@@ -65,7 +66,7 @@ class ScorePanel extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: fontColor,
           side: BorderSide(color: fontColor.withValues(alpha: 0.6)),
-          backgroundColor: Colors.black.withValues(alpha: 0.14),
+          backgroundColor: Colors.black.withValues(alpha: 0.18),
           minimumSize: const Size(48, 48),
           padding: const EdgeInsets.all(10),
         ),
@@ -80,19 +81,33 @@ class ScorePanel extends StatelessWidget {
         onTap: onTap,
         child: Stack(
           children: <Widget>[
-            // Score — centered
-            Center(
-              child: Text(
-                score.toString(),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: fontSize * 3.6,
-                  fontWeight: FontWeight.bold,
-                  color: fontColor,
+            // Score + player name — centered with extra breathing room.
+            Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 20, 16, reservedBottomSpace),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      score.toString(),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: fontSize * 3.6,
+                        fontWeight: FontWeight.bold,
+                        color: fontColor,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 240),
+                      child: nameWidget,
+                    ),
+                  ],
                 ),
               ),
             ),
-            // Name + edit button — corner (horizontally), middle (vertically)
+            // Edit button — corner (horizontally), middle (vertically)
             Align(
               alignment: nameAtLeft
                   ? Alignment.centerLeft
@@ -102,20 +117,7 @@ class ScorePanel extends StatelessWidget {
                   horizontal: 16,
                   vertical: 8,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: nameAtLeft
-                      ? CrossAxisAlignment.start
-                      : CrossAxisAlignment.end,
-                  children: <Widget>[
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 200),
-                      child: nameWidget,
-                    ),
-                    const SizedBox(height: 8),
-                    editButton,
-                  ],
-                ),
+                child: editButton,
               ),
             ),
             // Footer — pinned to bottom center
@@ -123,7 +125,7 @@ class ScorePanel extends StatelessWidget {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.only(bottom: 18),
                   child: footer!,
                 ),
               ),
