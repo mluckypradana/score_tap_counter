@@ -12,7 +12,7 @@ Repository target:
 
 ## Download APK
 
-- Latest APK in repository: [assets/apk/score_tap_counter-release.apk](assets/apk/score_tap_counter-release.apk)
+- Latest APK in repository: [Download score_tap_counter-release.apk](https://github.com/mluckypradana/score_tap_counter/raw/main/assets/apk/score_tap_counter-release.apk)
 
 ## Features
 
