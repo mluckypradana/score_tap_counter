@@ -86,6 +86,9 @@ class _SportCounterPageState extends State<SportCounterPage> {
   DateTime? _matchStartTime;
   Timer? _matchTicker;
 
+  // UI state
+  bool _showButtons = true;
+
   @override
   void initState() {
     super.initState();
@@ -499,6 +502,48 @@ class _SportCounterPageState extends State<SportCounterPage> {
     await _saveSettings();
   }
 
+  void _showHelpDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Swipe Gestures'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const <Widget>[
+              Text(
+                'Horizontal layout:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 4),
+              Text('• Swipe left → right  =  +Left score'),
+              Text('• Swipe right → left  =  +Right score'),
+              Text('• Swipe up  =  Reset scores'),
+              Text('• Swipe down  =  Switch scores'),
+              SizedBox(height: 14),
+              Text(
+                'Vertical layout:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 4),
+              Text('• Swipe bottom → top  =  +Bottom score'),
+              Text('• Swipe top → bottom  =  +Top score'),
+              Text('• Swipe right → left  =  Switch scores'),
+              Text('• Swipe left → right  =  Reset scores'),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _openSettings() async {
     final CounterSettings? result = await showDialog<CounterSettings>(
       context: context,
@@ -665,6 +710,7 @@ class _SportCounterPageState extends State<SportCounterPage> {
                             footer: !_showRightSide
                                 ? _buildSoloTimerWidget()
                                 : null,
+                            nameAtLeft: true,
                           ),
                         ),
                         if (_showRightSide)
@@ -678,6 +724,7 @@ class _SportCounterPageState extends State<SportCounterPage> {
                               onTap: _incrementRight,
                               onEditScore: () => _editScore(isLeft: false),
                               onEditName: () => _editPlayerName(isLeft: false),
+                              nameAtLeft: false,
                             ),
                           ),
                       ],
@@ -697,6 +744,7 @@ class _SportCounterPageState extends State<SportCounterPage> {
                             footer: !_showRightSide
                                 ? _buildSoloTimerWidget()
                                 : null,
+                            nameAtLeft: true,
                           ),
                         ),
                         if (_showRightSide)
@@ -710,101 +758,127 @@ class _SportCounterPageState extends State<SportCounterPage> {
                               onTap: _incrementRight,
                               onEditScore: () => _editScore(isLeft: false),
                               onEditName: () => _editPlayerName(isLeft: false),
+                              nameAtLeft: false,
                             ),
                           ),
                       ],
                     ),
               SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-                  child: Column(
-                    children: <Widget>[
+                child: Stack(
+                  children: <Widget>[
+                    // Always-visible toggle — top-right corner (above the top bar)
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Tooltip(
+                          message: _showButtons
+                              ? 'Hide buttons'
+                              : 'Show buttons',
+                          child: IconButton(
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.black.withValues(
+                                alpha: 0.2,
+                              ),
+                              foregroundColor: _fontColor,
+                              side: BorderSide(
+                                color: _fontColor.withValues(alpha: 0.6),
+                              ),
+                            ),
+                            icon: Icon(
+                              _showButtons
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                            ),
+                            onPressed: () =>
+                                setState(() => _showButtons = !_showButtons),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Top action buttons — Settings, History, Solo Mode, Layout
+                    if (_showButtons)
                       Align(
                         alignment: Alignment.topCenter,
-                        child: Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: <Widget>[
-                            OverlayActionButton(
-                              icon: Icons.settings,
-                              label: 'Settings',
-                              color: _fontColor,
-                              onPressed: _openSettings,
-                            ),
-                            OverlayActionButton(
-                              icon: Icons.history,
-                              label: 'History',
-                              color: _fontColor,
-                              onPressed: _openHistoryPage,
-                            ),
-                            OverlayActionButton(
-                              icon: Icons.bookmark_add_outlined,
-                              label: 'Save',
-                              color: _fontColor,
-                              onPressed: _saveCurrentScore,
-                            ),
-                            OverlayActionButton(
-                              icon: Icons.swap_horiz,
-                              label: 'Switch',
-                              color: _fontColor,
-                              onPressed: _swapScores,
-                            ),
-                            OverlayActionButton(
-                              icon: Icons.restart_alt,
-                              label: 'Reset',
-                              color: _fontColor,
-                              onPressed: _resetScores,
-                            ),
-                            OverlayActionButton(
-                              icon: _showRightSide
-                                  ? Icons.person_outline
-                                  : Icons.people_alt_outlined,
-                              label: _showRightSide
-                                  ? 'Solo Mode'
-                                  : 'Versus Mode',
-                              color: _fontColor,
-                              onPressed: _toggleRightSideVisibility,
-                            ),
-                            OverlayActionButton(
-                              icon: _isVerticalLayout
-                                  ? Icons.view_week_outlined
-                                  : Icons.view_stream_outlined,
-                              label: _isVerticalLayout
-                                  ? 'Horizontal Layout'
-                                  : 'Vertical Layout',
-                              color: _fontColor,
-                              onPressed: _toggleLayoutOrientation,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.18),
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: _fontColor.withValues(alpha: 0.35),
-                          ),
-                        ),
-                        child: Text(
-                          _isVerticalLayout
-                              ? 'Vertical mode: swipe bottom to top = +Bottom | top to bottom = +Top | right to left = Switch | left to right = Reset'
-                              : 'Horizontal mode: swipe left to right = +Left | right to left = +Right | up = Reset | down = Switch',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: _fontColor,
-                            fontWeight: FontWeight.w600,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 8, 56, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              OverlayActionButton(
+                                icon: Icons.settings,
+                                label: 'Settings',
+                                color: _fontColor,
+                                onPressed: _openSettings,
+                              ),
+                              OverlayActionButton(
+                                icon: Icons.history,
+                                label: 'History',
+                                color: _fontColor,
+                                onPressed: _openHistoryPage,
+                              ),
+                              OverlayActionButton(
+                                icon: _showRightSide
+                                    ? Icons.person_outline
+                                    : Icons.people_alt_outlined,
+                                label: _showRightSide
+                                    ? 'Solo Mode'
+                                    : 'Versus Mode',
+                                color: _fontColor,
+                                onPressed: _toggleRightSideVisibility,
+                              ),
+                              OverlayActionButton(
+                                icon: _isVerticalLayout
+                                    ? Icons.view_week_outlined
+                                    : Icons.view_stream_outlined,
+                                label: _isVerticalLayout
+                                    ? 'Horizontal Layout'
+                                    : 'Vertical Layout',
+                                color: _fontColor,
+                                onPressed: _toggleLayoutOrientation,
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    // Bottom action buttons — Save, Switch, Reset, Help
+                    if (_showButtons)
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              OverlayActionButton(
+                                icon: Icons.bookmark_add_outlined,
+                                label: 'Save',
+                                color: _fontColor,
+                                onPressed: _saveCurrentScore,
+                              ),
+                              OverlayActionButton(
+                                icon: Icons.swap_horiz,
+                                label: 'Switch',
+                                color: _fontColor,
+                                onPressed: _swapScores,
+                              ),
+                              OverlayActionButton(
+                                icon: Icons.restart_alt,
+                                label: 'Reset',
+                                color: _fontColor,
+                                onPressed: _resetScores,
+                              ),
+                              OverlayActionButton(
+                                icon: Icons.help_outline,
+                                label: 'Help',
+                                color: _fontColor,
+                                onPressed: _showHelpDialog,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               if (_showRightSide)

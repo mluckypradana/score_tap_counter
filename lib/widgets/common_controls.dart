@@ -7,6 +7,7 @@ class OverlayActionButton extends StatelessWidget {
     required this.label,
     required this.color,
     required this.onPressed,
+    this.compact = false,
   });
 
   final IconData icon;
@@ -14,8 +15,27 @@ class OverlayActionButton extends StatelessWidget {
   final Color color;
   final VoidCallback onPressed;
 
+  /// When true, renders as an icon-only button with a tooltip (saves horizontal space).
+  final bool compact;
+
   @override
   Widget build(BuildContext context) {
+    if (compact) {
+      return Tooltip(
+        message: label,
+        child: OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: color,
+            side: BorderSide(color: color.withValues(alpha: 0.6)),
+            backgroundColor: Colors.black.withValues(alpha: 0.14),
+            minimumSize: const Size(44, 44),
+            padding: const EdgeInsets.all(10),
+          ),
+          onPressed: onPressed,
+          child: Icon(icon, color: color, size: 22),
+        ),
+      );
+    }
     return OutlinedButton.icon(
       style: OutlinedButton.styleFrom(
         foregroundColor: color,
