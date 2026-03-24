@@ -18,7 +18,10 @@ Future<void> main() async {
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
-
+  await SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.manual,
+    overlays: <SystemUiOverlay>[SystemUiOverlay.top],
+  );
   runApp(const MyApp());
 }
 
@@ -884,7 +887,7 @@ class _SportCounterPageState extends State<SportCounterPage> {
               if (_showRightSide)
                 Center(
                   child: _matchStartTime == null
-                      ? OutlinedButton.icon(
+                      ? OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             foregroundColor: _fontColor,
                             side: BorderSide(
@@ -893,18 +896,16 @@ class _SportCounterPageState extends State<SportCounterPage> {
                             backgroundColor: Colors.black.withValues(
                               alpha: 0.2,
                             ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 12,
-                            ),
+                            shape: const CircleBorder(),
+                            minimumSize: const Size(64, 64),
+                            padding: const EdgeInsets.all(14),
                           ),
                           onPressed: () {
                             setState(() {
                               _startMatchTimer();
                             });
                           },
-                          icon: const Icon(Icons.play_arrow),
-                          label: const Text('Start Match Timer'),
+                          child: const Icon(Icons.play_arrow, size: 30),
                         )
                       : Container(
                           padding: const EdgeInsets.symmetric(
