@@ -2,7 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:http/http.dart' as http;
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'models/counter_settings.dart';
 import 'models/name_suggestion.dart';
@@ -22,6 +26,8 @@ Future<void> main() async {
     SystemUiMode.manual,
     overlays: <SystemUiOverlay>[SystemUiOverlay.top],
   );
+  // Enable wakelock to keep the screen on
+  await WakelockPlus.enable();
   runApp(const MyApp());
 }
 
@@ -96,6 +102,77 @@ class _SportCounterPageState extends State<SportCounterPage> {
   void initState() {
     super.initState();
     _loadSettings();
+    _checkForUpdate();
+  }
+
+  Future<void> _checkForUpdate() async {
+    // URL to your version file (update this to your actual version file location)
+    const String versionUrl =
+        'https://raw.githubusercontent.com/mluckypradana/score_tap_counter/main/version.json';
+    try {
+      final response = await http.get(Uri.parse(versionUrl));
+      if (response.statusCode == 200) {
+        final remote = response.body;
+        // Expecting JSON: { "version": "1.2.3", "apk_url": "https://...apk" }
+        final Map<String, dynamic> data = jsonDecode(remote);
+        final String latestVersion = data['version'] ?? '';
+        final String? apkUrl = data['apk_url'];
+        final PackageInfo info = await PackageInfo.fromPlatform();
+        final String currentVersion = info.version;
+        if (_isNewerVersion(latestVersion, currentVersion)) {
+          if (!mounted) return;
+          _showUpdateDialog(latestVersion, apkUrl);
+        }
+      }
+    } catch (_) {
+      // Ignore errors silently
+    }
+  }
+
+  bool _isNewerVersion(String remote, String local) {
+    List<int> parse(String v) =>
+        v.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final r = parse(remote);
+    final l = parse(local);
+    for (int i = 0; i < r.length; i++) {
+      if (i >= l.length) return true;
+      if (r[i] > l[i]) return true;
+      if (r[i] < l[i]) return false;
+    }
+    return false;
+  }
+
+  void _showUpdateDialog(String version, String? apkUrl) {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Update Available'),
+          content: Text('A new version ($version) is available.'),
+          actions: <Widget>[
+            if (apkUrl != null)
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _launchUrl(apkUrl);
+                },
+                child: const Text('Download'),
+              ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Later'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _launchUrl(String url) async {
+    // Use url_launcher if you want to open in browser, or just print for now
+    // You can add url_launcher for a better experience
+    // For now, just print
+    debugPrint('Open URL: $url');
   }
 
   Future<void> _loadSettings() async {
